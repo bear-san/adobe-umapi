@@ -1,9 +1,11 @@
 package user
 
 type Request struct {
-	User      string    `json:"user"`
-	RequestID string    `json:"requestID"`
-	Do        []Command `json:"do"`
+	User       string    `json:"user"`
+	RequestID  string    `json:"requestID"`
+	Domain     string    `json:"domain"`
+	UseAdobeID bool      `json:"useAdobeID"`
+	Do         []Command `json:"do"`
 }
 
 type Command struct {
