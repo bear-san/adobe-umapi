@@ -23,3 +23,7 @@ type CreateFederatedIDRequest struct {
 	LastName  string `json:"lastname"`
 	Option    string `json:"option"`
 }
+
+type AddGroupRequest struct {
+	Group []string `json:"group"`
+}
