@@ -1,6 +1,6 @@
 package user
 
-type AddAdobeID struct {
+type AddAdobeIDRequest struct {
 	Email     string `json:"email"`
 	Country   string `json:"country"`
 	FirstName string `json:"firstname"`
@@ -8,7 +8,7 @@ type AddAdobeID struct {
 	Option    string `json:"option"`
 }
 
-type CreateEnterpriseID struct {
+type CreateEnterpriseIDRequest struct {
 	Email     string `json:"email"`
 	Country   string `json:"country"`
 	FirstName string `json:"firstname"`
@@ -16,7 +16,7 @@ type CreateEnterpriseID struct {
 	Option    string `json:"option"`
 }
 
-type CreateFederatedID struct {
+type CreateFederatedIDRequest struct {
 	Email     string `json:"email"`
 	Country   string `json:"country"`
 	FirstName string `json:"firstname"`
