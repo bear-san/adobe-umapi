@@ -2,7 +2,11 @@ package auth
 
 import (
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
+	"net/url"
+	"strings"
 )
 
 var baseUrl = "https://ims-na1.adobelogin.com/ims/token/v2"
@@ -14,15 +18,17 @@ func Setup(clientId string, clientSecret string) error {
 	}
 
 	httpClient := http.DefaultClient
-	req, err := http.NewRequest("POST", baseUrl, nil)
+	values := url.Values{}
+
+	values.Set("grant_type", "client_credentials")
+	values.Set("client_id", clientId)
+	values.Set("client_secret", clientSecret)
+	values.Set("scope", "openid,AdobeID,user_management_sdk")
+
+	req, err := http.NewRequest("POST", baseUrl, strings.NewReader(values.Encode()))
 	if err != nil {
 		return err
 	}
-
-	req.Form.Add("grant_type", "client_credentials")
-	req.Form.Add("client_id", clientId)
-	req.Form.Add("client_secret", clientSecret)
-	req.Form.Add("scope", "openid,AdobeID,user_management_sdk")
 
 	for key, value := range headers {
 		req.Header.Set(key, value)
@@ -31,6 +37,11 @@ func Setup(clientId string, clientSecret string) error {
 	res, err := httpClient.Do(req)
 	if err != nil {
 		return err
+	}
+
+	if res.StatusCode != 200 {
+		errPayload, _ := io.ReadAll(res.Body)
+		return fmt.Errorf("failed to get access token: %v", string(errPayload))
 	}
 
 	Credential = AccessTokenPayload{}
