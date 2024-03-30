@@ -1,5 +1,5 @@
-# Adobe User Management API(UMAPI) - Go SDK
-This library wraps the Adobe User Management API(UMAPI) for Go. It provides a simple way to interact with the API.
+# Adobe User Management API(UMAPI) - Go SDK (unofficial)
+This library wraps the Adobe User Management API(UMAPI) for Go. 
 
 ## Installation
 ```bash
