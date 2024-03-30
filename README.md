@@ -78,4 +78,6 @@ completed: 1, notCompleted: 0, completedInTestMode: 0
 - [ ] Get Users by Group
 
 ## License
-see [LICENSE](LICENSE)
+see [LICENSE](LICENSE).
+
+"Adobe" is registered trademark of Adobe Inc.
