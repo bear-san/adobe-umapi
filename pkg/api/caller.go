@@ -17,8 +17,8 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bear-san/adobe-umapi/auth"
-	"github.com/bear-san/adobe-umapi/user"
+	"github.com/bear-san/adobe-umapi/pkg/auth"
+	"github.com/bear-san/adobe-umapi/pkg/user"
 	"io"
 	"net/http"
 	"strings"

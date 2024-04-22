@@ -16,8 +16,8 @@ package api
 
 import (
 	"fmt"
-	"github.com/bear-san/adobe-umapi/auth"
-	user2 "github.com/bear-san/adobe-umapi/user"
+	"github.com/bear-san/adobe-umapi/pkg/auth"
+	"github.com/bear-san/adobe-umapi/pkg/user"
 	"os"
 	"testing"
 	"time"
@@ -34,16 +34,16 @@ func TestExec(t *testing.T) {
 
 	t.Run("Create User", func(t *testing.T) {
 		// 作成系のテスト
-		userRequests := []user2.Request{
+		userRequests := []user.Request{
 			// EnterpriseIDの作成
 			{
 				User:       fmt.Sprintf("tools-test-enterprise-id@%s", enterpriseIdDomain),
 				RequestID:  "Create_Enterprise_ID",
 				Domain:     nil,
 				UseAdobeID: false,
-				Do: []user2.Command{
+				Do: []user.Command{
 					{
-						CreateEnterpriseID: &user2.CreateEnterpriseIDRequest{
+						CreateEnterpriseID: &user.CreateEnterpriseIDRequest{
 							Email:     fmt.Sprintf("tools-test-enterprise-id@%s", enterpriseIdDomain),
 							Country:   "JP",
 							FirstName: "Test",
@@ -59,9 +59,9 @@ func TestExec(t *testing.T) {
 				RequestID:  "Create_Federated_ID",
 				Domain:     &federatedIdDomain,
 				UseAdobeID: false,
-				Do: []user2.Command{
+				Do: []user.Command{
 					{
-						CreateFederatedID: &user2.CreateFederatedIDRequest{
+						CreateFederatedID: &user.CreateFederatedIDRequest{
 							Email:     fmt.Sprintf("tools-test-federated-id@%s", federatedIdDomain),
 							Country:   "JP",
 							FirstName: "Test",
@@ -85,15 +85,15 @@ func TestExec(t *testing.T) {
 
 	t.Run("Add Group", func(t *testing.T) {
 		// グループ追加のテスト
-		userRequests := []user2.Request{
+		userRequests := []user.Request{
 			{
 				User:       fmt.Sprintf("tools-test-enterprise-id@%s", enterpriseIdDomain),
 				RequestID:  "Add_Group_Enterprise_ID",
 				Domain:     nil,
 				UseAdobeID: false,
-				Do: []user2.Command{
+				Do: []user.Command{
 					{
-						AddGroup: &user2.AddGroupRequest{
+						AddGroup: &user.AddGroupRequest{
 							Group: []string{"test-group"},
 						},
 					},
@@ -104,9 +104,9 @@ func TestExec(t *testing.T) {
 				RequestID:  "Add_Group_Federated_ID",
 				Domain:     nil,
 				UseAdobeID: false,
-				Do: []user2.Command{
+				Do: []user.Command{
 					{
-						AddGroup: &user2.AddGroupRequest{
+						AddGroup: &user.AddGroupRequest{
 							Group: []string{"test-group"},
 						},
 					},
@@ -128,15 +128,15 @@ func TestExec(t *testing.T) {
 
 	t.Run("Update User", func(t *testing.T) {
 		// 更新系のテスト
-		userRequests := []user2.Request{
+		userRequests := []user.Request{
 			{
 				User:       fmt.Sprintf("tools-test-enterprise-id@%s", enterpriseIdDomain),
 				RequestID:  "Update_Enterprise_ID",
 				Domain:     nil,
 				UseAdobeID: false,
-				Do: []user2.Command{
+				Do: []user.Command{
 					{
-						Update: &user2.UpdateRequest{
+						Update: &user.UpdateRequest{
 							Email:     fmt.Sprintf("tools-test-enterprise-id@%s", enterpriseIdDomain),
 							FirstName: "Updated",
 							LastName:  "EnterpriseID",
@@ -150,9 +150,9 @@ func TestExec(t *testing.T) {
 				RequestID:  "Update_Federated_ID",
 				Domain:     nil,
 				UseAdobeID: false,
-				Do: []user2.Command{
+				Do: []user.Command{
 					{
-						Update: &user2.UpdateRequest{
+						Update: &user.UpdateRequest{
 							Email:     fmt.Sprintf("tools-test-federated-id@%s", federatedIdDomain),
 							FirstName: "Updated",
 							LastName:  "FederatedID",
@@ -177,15 +177,15 @@ func TestExec(t *testing.T) {
 
 	t.Run("Remove User from Group", func(t *testing.T) {
 		// グループからの削除のテスト
-		userRequests := []user2.Request{
+		userRequests := []user.Request{
 			{
 				User:       fmt.Sprintf("tools-test-enterprise-id@%s", enterpriseIdDomain),
 				RequestID:  "Remove_Group_Enterprise_ID",
 				Domain:     nil,
 				UseAdobeID: false,
-				Do: []user2.Command{
+				Do: []user.Command{
 					{
-						RemoveFromGroup: &user2.RemoveFromGroupRequest{
+						RemoveFromGroup: &user.RemoveFromGroupRequest{
 							Group: []string{"test-group"},
 						},
 					},
@@ -196,9 +196,9 @@ func TestExec(t *testing.T) {
 				RequestID:  "Remove_Group_Federated_ID",
 				Domain:     nil,
 				UseAdobeID: false,
-				Do: []user2.Command{
+				Do: []user.Command{
 					{
-						RemoveFromGroup: &user2.RemoveFromGroupRequest{
+						RemoveFromGroup: &user.RemoveFromGroupRequest{
 							Group: []string{"test-group"},
 						},
 					},
@@ -220,15 +220,15 @@ func TestExec(t *testing.T) {
 
 	t.Run("Remove User from Org", func(t *testing.T) {
 		// 組織からの削除のテスト
-		userRequests := []user2.Request{
+		userRequests := []user.Request{
 			{
 				User:       fmt.Sprintf("tools-test-enterprise-id@%s", enterpriseIdDomain),
 				RequestID:  "Remove_Org_Enterprise_ID",
 				Domain:     nil,
 				UseAdobeID: false,
-				Do: []user2.Command{
+				Do: []user.Command{
 					{
-						RemoveFromOrg: &user2.RemoveFromOrgRequest{
+						RemoveFromOrg: &user.RemoveFromOrgRequest{
 							DeleteAccount: true,
 						},
 					},
@@ -239,9 +239,9 @@ func TestExec(t *testing.T) {
 				RequestID:  "Remove_Org_Federated_ID",
 				Domain:     nil,
 				UseAdobeID: false,
-				Do: []user2.Command{
+				Do: []user.Command{
 					{
-						RemoveFromOrg: &user2.RemoveFromOrgRequest{
+						RemoveFromOrg: &user.RemoveFromOrgRequest{
 							DeleteAccount: true,
 						},
 					},
