@@ -26,7 +26,11 @@ import (
 
 var BaseUrl = "https://usermanagement.adobe.io/v2/usermanagement"
 
-func Exec(userRequests *[]user.Request, auth auth.AccessTokenPayload, orgId string, apiKey string) (*Result, error) {
+type Caller struct {
+	auth auth.AccessTokenPayload
+}
+
+func (caller Caller) Exec(userRequests *[]user.Request, orgId string, apiKey string) (*Result, error) {
 	payload, err := json.Marshal(userRequests)
 	if err != nil {
 		return nil, err
@@ -34,8 +38,12 @@ func Exec(userRequests *[]user.Request, auth auth.AccessTokenPayload, orgId stri
 
 	httpClient := http.DefaultClient
 	req, err := http.NewRequest("POST", BaseUrl+"/action/"+orgId, strings.NewReader(string(payload)))
+	if err != nil {
+		return nil, err
+	}
+
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Authorization", "Bearer "+auth.AccessToken)
+	req.Header.Add("Authorization", "Bearer "+caller.auth.AccessToken)
 	req.Header.Add("X-Api-Key", apiKey)
 
 	res, err := httpClient.Do(req)
@@ -57,6 +65,10 @@ func Exec(userRequests *[]user.Request, auth auth.AccessTokenPayload, orgId stri
 	err = json.Unmarshal(resultText, &result)
 
 	return &result, err
+}
+
+func NewCaller(auth auth.AccessTokenPayload) *Caller {
+	return &Caller{auth: auth}
 }
 
 type Result struct {

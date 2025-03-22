@@ -24,10 +24,11 @@ import (
 )
 
 func TestExec(t *testing.T) {
-	err := auth.Setup(os.Getenv("CLIENT_ID"), os.Getenv("CLIENT_SECRET"))
+	token, err := auth.Setup(os.Getenv("CLIENT_ID"), os.Getenv("CLIENT_SECRET"))
 	if err != nil {
 		t.Errorf("failed to setup credential: %v", err)
 	}
+	caller := Caller{auth: *token}
 
 	federatedIdDomain := os.Getenv("FEDERATED_ID_DOMAIN")
 	enterpriseIdDomain := os.Getenv("ENTERPRISE_ID_DOMAIN")
@@ -73,7 +74,7 @@ func TestExec(t *testing.T) {
 			},
 		}
 
-		result, err := Exec(&userRequests, auth.Credential, os.Getenv("ORG_ID"), os.Getenv("CLIENT_ID"))
+		result, err := caller.Exec(&userRequests, os.Getenv("ORG_ID"), os.Getenv("CLIENT_ID"))
 		if err != nil {
 			t.Errorf("failed to create user: %v", err)
 		}
@@ -114,7 +115,7 @@ func TestExec(t *testing.T) {
 			},
 		}
 
-		result, err := Exec(&userRequests, auth.Credential, os.Getenv("ORG_ID"), os.Getenv("CLIENT_ID"))
+		result, err := caller.Exec(&userRequests, os.Getenv("ORG_ID"), os.Getenv("CLIENT_ID"))
 		if err != nil {
 			t.Errorf("failed to add group: %v", err)
 		}
@@ -163,7 +164,7 @@ func TestExec(t *testing.T) {
 			},
 		}
 
-		result, err := Exec(&userRequests, auth.Credential, os.Getenv("ORG_ID"), os.Getenv("CLIENT_ID"))
+		result, err := caller.Exec(&userRequests, os.Getenv("ORG_ID"), os.Getenv("CLIENT_ID"))
 		if err != nil {
 			t.Errorf("failed to update user: %v", err)
 		}
@@ -206,7 +207,7 @@ func TestExec(t *testing.T) {
 			},
 		}
 
-		result, err := Exec(&userRequests, auth.Credential, os.Getenv("ORG_ID"), os.Getenv("CLIENT_ID"))
+		result, err := caller.Exec(&userRequests, os.Getenv("ORG_ID"), os.Getenv("CLIENT_ID"))
 		if err != nil {
 			t.Errorf("failed to remove user from group: %v", err)
 		}
@@ -249,7 +250,7 @@ func TestExec(t *testing.T) {
 			},
 		}
 
-		result, err := Exec(&userRequests, auth.Credential, os.Getenv("ORG_ID"), os.Getenv("CLIENT_ID"))
+		result, err := caller.Exec(&userRequests, os.Getenv("ORG_ID"), os.Getenv("CLIENT_ID"))
 		if err != nil {
 			t.Errorf("failed to remove user from org: %v", err)
 		}
