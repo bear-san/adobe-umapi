@@ -26,7 +26,7 @@ import (
 var baseUrl = "https://ims-na1.adobelogin.com/ims/token/v2"
 var Credential AccessTokenPayload
 
-func Setup(clientId string, clientSecret string) error {
+func Setup(clientId string, clientSecret string) (*AccessTokenPayload, error) {
 	headers := map[string]string{
 		"Content-Type": "application/x-www-form-urlencoded",
 	}
@@ -41,7 +41,7 @@ func Setup(clientId string, clientSecret string) error {
 
 	req, err := http.NewRequest("POST", baseUrl, strings.NewReader(values.Encode()))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	for key, value := range headers {
@@ -50,21 +50,21 @@ func Setup(clientId string, clientSecret string) error {
 
 	res, err := httpClient.Do(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if res.StatusCode != 200 {
 		errPayload, _ := io.ReadAll(res.Body)
-		return fmt.Errorf("failed to get access token: %v", string(errPayload))
+		return nil, fmt.Errorf("failed to get access token: %v", string(errPayload))
 	}
 
 	Credential = AccessTokenPayload{}
 	err = json.NewDecoder(res.Body).Decode(&Credential)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return &Credential, nil
 }
 
 type AccessTokenPayload struct {
