@@ -17,34 +17,43 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bear-san/adobe-umapi/pkg/auth"
 	"github.com/bear-san/adobe-umapi/pkg/user"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
-var BaseUrl = "https://usermanagement.adobe.io/v2/usermanagement"
+const (
+	authBaseUrl = "https://ims-na1.adobelogin.com/ims/token/v2"
+	baseUrl     = "https://usermanagement.adobe.io/v2/usermanagement"
+)
 
 type Caller struct {
-	auth auth.AccessTokenPayload
+	clientID     string
+	clientSecret string
 }
 
-func (caller Caller) Exec(userRequests *[]user.Request, orgId string, apiKey string) (*Result, error) {
+func (caller Caller) Exec(userRequests *[]user.Request, orgId string) (*Result, error) {
+	credential, err := caller.authSetup(caller.clientID, caller.clientSecret)
+	if err != nil {
+		return nil, err
+	}
+
 	payload, err := json.Marshal(userRequests)
 	if err != nil {
 		return nil, err
 	}
 
 	httpClient := http.DefaultClient
-	req, err := http.NewRequest("POST", BaseUrl+"/action/"+orgId, strings.NewReader(string(payload)))
+	req, err := http.NewRequest("POST", baseUrl+"/action/"+orgId, strings.NewReader(string(payload)))
 	if err != nil {
 		return nil, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Authorization", "Bearer "+caller.auth.AccessToken)
-	req.Header.Add("X-Api-Key", apiKey)
+	req.Header.Add("Authorization", "Bearer "+credential.AccessToken)
+	req.Header.Add("X-Api-Key", caller.clientID)
 
 	res, err := httpClient.Do(req)
 	if err != nil {
@@ -67,8 +76,58 @@ func (caller Caller) Exec(userRequests *[]user.Request, orgId string, apiKey str
 	return &result, err
 }
 
-func NewCaller(auth auth.AccessTokenPayload) *Caller {
-	return &Caller{auth: auth}
+func (caller Caller) authSetup(clientId string, clientSecret string) (*AccessTokenPayload, error) {
+	headers := map[string]string{
+		"Content-Type": "application/x-www-form-urlencoded",
+	}
+
+	httpClient := http.DefaultClient
+	values := url.Values{}
+
+	values.Set("grant_type", "client_credentials")
+	values.Set("client_id", clientId)
+	values.Set("client_secret", clientSecret)
+	values.Set("scope", "openid,AdobeID,user_management_sdk")
+
+	req, err := http.NewRequest("POST", authBaseUrl, strings.NewReader(values.Encode()))
+	if err != nil {
+		return nil, err
+	}
+
+	for key, value := range headers {
+		req.Header.Set(key, value)
+	}
+
+	res, err := httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.StatusCode != 200 {
+		errPayload, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("failed to get access token: %v", string(errPayload))
+	}
+
+	credential := AccessTokenPayload{}
+	err = json.NewDecoder(res.Body).Decode(&credential)
+	if err != nil {
+		return nil, err
+	}
+
+	return &credential, nil
+}
+
+func NewCaller(clientID string, clientSecret string) *Caller {
+	return &Caller{
+		clientID:     clientID,
+		clientSecret: clientSecret,
+	}
+}
+
+type AccessTokenPayload struct {
+	AccessToken string `json:"access_token"`
+	TokenType   string `json:"token_type"`
+	ExpiresIn   int    `json:"expires_in"`
 }
 
 type Result struct {
